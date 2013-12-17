@@ -1,17 +1,6 @@
 (function( ) {
     "use strict";
 
-    //  Contained in $QDecorator.js
-    //
-    //  $q.spread = function( targetFn,scope )
-    //  {
-    //      return function()
-    //      {
-    //          var params = [].concat(arguments[0]);
-    //          targetFn.apply(scope, params);
-    //      };
-    //  };
-
     // 3-call sequence:  getFlightDetails() -> (getPlaneDetails() + getForecast())
 
     var FlightDashboard = function( $scope, user, flightService, weatherService, $q )

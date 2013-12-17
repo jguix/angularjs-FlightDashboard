@@ -30,7 +30,7 @@
                             .getForecast( $scope.flight.departure )                   // Reqeust #3
                             .then(function( info )
                             {
-                                $scope.forecast = info.forecast;                // Response Handler #3
+                                $scope.weather = forecast;                // Response Handler #3
                                 return info;
                             });
                 };
@@ -45,7 +45,7 @@
 
             $scope.flight     = null;
             $scope.plane      = null;
-            $scope.forecast   = null;
+            $scope.weather    = null;
 
         };
 
