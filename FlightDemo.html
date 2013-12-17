@@ -8,12 +8,8 @@
         <script src="./lib/$QDecorator.js"  ></script>
         <script src="./lib/angular.js"      ></script>
 
-        <!--
-            Custom application code
-        -->
-
         <script src="src/FlightServices.js"></script>
-        <script src="src/Dashboard_4.js"></script>
+        <script src="src/Dashboard_1.js"></script>
 
         <script>
 
@@ -30,11 +26,13 @@
         </script>
 
     </head>
-    <body ng-app="MyFlightApp" ng-controller="flightDashboard" style="padding-left:20px; padding-top:30px;">
+    <body ng-app="MyFlightApp" ng-controller="flightDashboard" class="demo">
 
-        Your Departure: <span class="departure">{{ flight.departure }}</span><br/>
-        Your Departure: <span class="departure">{{ forecast }}</span><br/>
-        Flight #: <span class="departure">{{ plane.make.model }}</span><br/>
+        <p>Hello  <span class="data">{{ user.email }}</span>, here is your itinerary:</p>
+
+        Your Departure:   <span class="data">{{ flight.departure }}</span><br/>
+        Flight #:         <span class="data">{{ plane.make.model }}</span><br/>
+        Weather Forecast: <span class="data">{{ weather.forecast }}</span><br/>
 
     </body>
 </html>

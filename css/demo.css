@@ -1,6 +1,20 @@
-.departure {
+
+.demo {
+    padding-left:40px;
+}
+
+.demo p {
+    background-color: #ffdf8b;
+    border-radius: 4px;
+    width: 430px;
+    line-height: 18px;
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.demo .data {
     color: blue;
     font-size: 16px;
     font-weight: bold;
-    padding-left: 15px;
 }

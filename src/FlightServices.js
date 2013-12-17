@@ -1,17 +1,6 @@
 (function(angular) {
     "use strict";
 
-    var resolveWith = function( $q)
-        {
-           return  function resolved( response )
-                   {
-                        var dfd = $q.defer();
-                            dfd.resolve( response );
-
-                       return dfd.promise;
-                   };
-        }
-
     angular.module( "FlightServices", [ ] )
            .config( window.$QDecorator )
             /**
@@ -27,15 +16,13 @@
              */
            .service( "flightService", function( user, $q )
             {
-               resolveWith = resolveWith( $q )
-
                return {
                    /**
                     * Return mock flight data for the specified user
                     */
                    getFlightDetails : function( user )
                    {
-                       return resolveWith ({
+                       return $q.resolve ({
                                 userID : user.email,
                                 flight : {
                                     id        : "UA_343223",
@@ -49,7 +36,7 @@
                     */
                    getPlaneDetails : function( flightID )
                    {
-                       return resolveWith ({
+                       return $q.resolve ({
                                   id    : flightID,
                                   pilot : "Captain Morgan",
                                   make : {
@@ -63,12 +50,12 @@
             /**
              * Weather service
              */
-            .service( "weatherService", function( )
+            .service( "weatherService", function( $q )
             {
                 return {
                     getForecast : function( date )
                     {
-                        return resolveWith({
+                        return $q.resolve ({
                                    date     : date,
                                    forecast : "rain"
                                });
