@@ -1,27 +1,25 @@
 (function( ) {
     "use strict";
 
-    var FlightDashboard = function( $scope, user, flightService, weatherService, $q, $log )
+    var FlightDashboard = function( $scope, user, travelService, weatherService, $q, $log )
         {
             var loadFlight = function( user )
                 {
-                    return flightService.getFlightDetails( user.email );            // Request #1
+                    return travelService.getDeparture( user.email );               // Request #1
                 },
-                loadStatusAndWeather = function ( response )
+                parallelLoad = function ( departure )
                 {
-                    var flight = response.flight;
-
                     // Execute #2 & #3 in parallel...
 
                     return $q.all([
-                            flightService.getPlaneDetails( flight.id ),             // Request #2
-                            weatherService.getForecast( flight.departure )          // Reqeust #3
+                            travelService.getFlight( departure.flightID ),         // Request #2
+                            weatherService.getForecast( departure.date  )          // Reqeust #3
                         ])
-                        .then( $q.spread( function( plane, info )
+                        .then( $q.spread( function( flight, weather )
                         {
-                            $scope.flight      = flight;                            // Response Handler #1
-                            $scope.plane       = plane;                             // Response Handler #2
-                            $scope.forecast    = info.forecast;                     // Response Handler #3
+                            $scope.departure   = departure;                        // Response Handler #1
+                            $scope.flight      = flight;                           // Response Handler #2
+                            $scope.weather     = weather;                          // Response Handler #3
 
                             throw( new Error("Just to prove catch() works! ") );
                         }));
@@ -36,12 +34,12 @@
             // and now we can include logging for of problems within ANY of the steps
 
             loadFlight( user )
-                .then( loadStatusAndWeather )
+                .then( parallelLoad )
                 .catch( reportProblems );
 
         };
 
-    window.FlightDashboard = [ "$scope", "user", "flightService", "weatherService", "$q", "$log", FlightDashboard ];
+    window.FlightDashboard = [ "$scope", "user", "travelService", "weatherService", "$q", "$log", FlightDashboard ];
 
 }( ));
 

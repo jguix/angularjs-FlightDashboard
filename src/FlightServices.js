@@ -11,33 +11,33 @@
                repository : "https://github.com/ThomasBurleson/angularjs-FlightDashboard"
             };
         })
-        .service( "flightService", function( user, $q )
+        .service( "travelService", function( user, $q )
         {
+            // Flight API (each returns a promise)
             return {
-                getFlightDetails : function( user )
+                getDeparture : function( user )
                 {
                     var dfd = $q.defer();
 
-                        // Mock travel information for the user's flight
+                        // Mock departure information for the user's flight
 
                         dfd.resolve({
-                            userID : user.email,
-                            flight : {
-                                id        : "UA_343223",
-                                departure : "01/14/2014 8:00 AM"
-                            }
+                            userID   : user.email,
+                            flightID : "UA_343223",
+                            date     : "01/14/2014 8:00 AM"
                         });
 
                     return dfd.promise;
 
                 },
-                getPlaneDetails : function( flightID )
+                getFlight : function( flightID )
                 {
                     return $q.resolve ({
                         id    : flightID,
                         pilot : "Captain Morgan",
-                        make : {
-                            model : "Boeing 747 RC"
+                        plane : {
+                            make  : "Boeing 747 RC",
+                            model : "TA-889"
                         },
                         status: "onTime"
                     });
@@ -46,6 +46,7 @@
         })
         .service( "weatherService", function( $q )
         {
+            // Weather API (each returns a promise)
             return {
                 getForecast : function( date )
                 {
