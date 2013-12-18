@@ -18,15 +18,15 @@ Let's explore the hidden power in chain promises.
 
 ### The FlightDashboard
 
-Consider the Flight Service shown which loads information about the user's upcoming flight. Below our *service* shows how a a remote web service by returns a JSON data file... Remember that data calls are asynchronous and our FlightService request generates **a promise to respond** when the information is loaded.
+Consider the Travel Service shown which loads information about the user's upcoming travel departure. Below our *service* shows how a a remote web service by returns a JSON data file... Remember that data calls are asynchronous and our TravelService request generates **a promise to respond** when the information is loaded.
 
-```javascript
+```
 
-var FlightService = function( $http )
+var TravelService = function( $http )
 	{
 		return {
 
-			getFlightdDetails : function( user )
+			getDeparture : function( user )
 			{
 				return $http.get (
 					URL_LAST_FLIGHT,
@@ -39,19 +39,18 @@ var FlightService = function( $http )
 
 Now let's use this service from a `FlightDashboard` to load the user's scheduled flight:
 
-```javascript
-
-var FlightDashboard = function( $scope, user, flightService )
+```
+var FlightDashboard = function( $scope, user, travelService )
 	{
-		flightService
-			.getFlightdDetails( user )
-			.then( function( response )
+		travelService
+			.getDeparture( user )
+			.then( function( departure )
 			{
-				// Publish the flight details to the view
-				$scope.flight = response.flight;
+				// Publish the departure details to the view
+				$departure = departure;
 			});
 
-		$scope.flight = null;
+		$scope.departure = null;
 	};
 ```
 
@@ -64,45 +63,46 @@ Okay this is nice... but nothing shockingly new is shown here. So let's add some
 
 Now let's assume that once we have flight details, then we will also want to check the weather forecast and the flight status. 
 
-The scenario here is a cascaded 3-call sequence:  `getFlightDetails()` -> `getPlaneDetails()` -> `getForecast()`
+The scenario here is a cascaded 3-call sequence:  `getDeparture()` -> `getFlight()` -> `getForecast()`
 
-![Flight-Chain](https://f.cloud.github.com/assets/210413/1750918/99369b2c-65be-11e3-8a96-c7cf8119a306.jpg)
+![sequential chaining](https://f.cloud.github.com/assets/210413/1777753/2e351326-682a-11e3-844a-d3583486f558.jpg)
 
 
-```javascript
-
-var FlightDashboard = function( $scope, user, flightService, weatherService )
+```
+var FlightDashboard = function( $scope, user, travelService, weatherService )
     {
-      // Level 1
-    
-      flightService
-        .getFlightDetails( user.email )           // Request #1
-        .then( function( details )              // Response Handler #1
-        {
-          $scope.flight = details.flight;
-    
-          // Level 2
-    
-          flightService
-            .getPlaneDetails( details.flight.id )       // Request #2
-            .then( function( plane  )             // Response Handler #2
+        // Level 1
+        travelService
+            .getDeparture( user.email )                 // Request #1
+            .then( function( departure )                // Response Handler #1
             {
-              $scope.plane = plane ;
-    
-              // Level 3
-    
-              weatherService
-                .getForecast( details.flight.departure )  // Reqeust #3
-                .then( function( info )           // Response Handler #3
-                {
-                  $scope.forecast = info.forecast;
-                });
+                $scope.departure = departure;
+
+                // Level 2
+                travelService
+                    .getFlight( departure.flightID )        // Request #2
+                    .then( function( flight  )              // Response Handler #2
+                    {
+                        $scope.flight = flight;
+
+                        // Level 3
+                        weatherService
+                            .getForecast( departure.date )      // Request #3
+                            .then( function( weather )          // Response Handler #3
+                            {
+                                $scope.weather = weather;
+                            });
+                    });
             });
-        });
+
+
     };
 ```
 
-The above implementation uses deep-nesting to create a sequential, cascading chain of three (3) asynchronous requests; requests to load the user's last flight, current flight, and weather forecast. 
+Notice how the success handler for getFlight() is passed the flight object. And the success handler for getForecast() is passed the weather object... both of which are published to the scope.
+
+
+The above implementation uses deep-nesting to create a sequential, cascading chain of three (3) asynchronous requests; requests to load the user's depature, flight information, and weather forecast. 
 
 >
 Note that the code shown above does NOT handle errors. And any nested rejections will not be propogated properly.
@@ -122,34 +122,34 @@ I personally consider deep nesting to be an **anti-pattern**. Fortunately we can
 
 Since promise handlers can **return Promises**, let's use that technique to refactor a new implementation:
 
-```javascript
+```
 var FlightDashboard = function( $scope, user, flightService, weatherService )
-	{
-		flightService
-			.getFlightdDetails( user )										// Request #1
-			.then( function( flight )
-			{
-				$scope.flight = flight;										// Response Handler #1
-				return getPlaneDetails( flight.id );		// Request #2
-
-			})
-			.then( function( plane )
-			{
-				$scope.plane = plane;							// Response Handler #2
-				return weatherService.getForecast( $scope.flight.departure );			// Reqeust #3
-			})
-			.then( function( forecast )
-			{
-				$scope.forecast = forecast;									// Response Handler #3
-			});
-
-		$scope.flight     = null;
-		$scope.planStatus = null;
-		$scope.forecast   = null;
-	};
+    {
+        travelService
+            .getDeparture( user )                                           // Request #1
+            .then( function( departure )
+            {
+                $scope.departure = departure;                               // Response Handler #1
+                return travelService.getFlight( departure.flightID );       // Request #2
+ 
+            })
+            .then( function( flight )
+            {
+                $scope.flight = flight;                                     // Response Handler #2
+                return weatherService.getForecast( $scope.departure.date ); // Reqeust #3
+            })
+            .then( function( weather )
+            {
+                $scope.weather = weather;                                   // Response Handler #3
+            });
+ 
+        $scope.flight     = null;
+        $scope.planStatus = null;
+        $scope.forecast   = null;
+    };
 ```
 
-The important change here is to notice that the reponse handler **returns** a Promise. See how the handler for `getFlightDetails()` returns a promise for `getPlaneDetails()`? And the success handler for `getPlaneDetails()` which returns a promise for `getForecast()` ? 
+The important change here is to notice that the reponse handler **returns** a Promise. See how the handler for `getDeparture()` returns a promise for `getFlight()`? And the success handler for `getFlight()` which returns a promise for `getForecast()`. 
 
 >
 Remember that success handlers can either (a) return the response value, (b) throw an exception, or (c) return a **Promise**
@@ -159,120 +159,147 @@ This is a good example of a flattened **promise chain** approach.
 >
 This is also an anti-pattern example... for several reasons:
 *  we modified a $scope variable at each level; instead of a single-pass modification of all three (3) $scope variables.
-*  `getForecast()` call references `$scope.flight.departure` instead of an *argument-passed reference*.
+*  `getForecast()` call references `$scope.departure.date` instead of an *argument-passed reference*.
 
 ---
 
 ### Better Refactors
 
-What else can we do? Notice that if we consider the async **request-response** pairs as a self-contained process, then we can simplify our code even further:
+What else can we do? What if we viewed each request-response as a self-contained process? Then we could chain processes...
 
-```javascript
-var FlightDashboard = function( $scope, user, flightService, weatherService, $log )
-	{
-		var loadFlight = function( user )
-			{
-				return flightService
-							.getUpcomingFlight( user )				// Request #1
-							.then( function( flight )
-							{
-								$scope.flight = flight;				// Response Handler #1
-								return flight;
-							});
-			},
-			loadPlaneStatus = function( flight )
-			{
-				return FlightService
-							.getPlaneStatus( flight.id );			// Request #2
-							.then( function( plane )
-							{
-								$scope.plane = plane;						// Response Handler #2
-								return plane;
-							});
-			},
-			loadWeatherForecast = function()
-			{
-				return weatherService
-							.getForecast( $scope.flight.departure );	// Reqeust #3
-							.then(function( forecast )
-							{
-								$scope.forecast = forecast;				// Response Handler #3
-								return forecast
-							});
-			};
+```
+    var FlightDashboard = function( $scope, user, travelService, weatherService )
+        {
+            var loadDeparture = function( user )
+                {
+                    return travelService
+                            .getDeparture( user.email )                     // Request #1
+                            .then( function( departure )
+                            {
+                                $scope.departure = departure;               // Response Handler #1
+
+                                return departure.flightID;
+                            });
+                },
+                loadFlight = function( flightID)
+                {
+                    return travelService
+                            .getFlight( flightID )                          // Request #2
+                            .then( function( flight )
+                            {
+                                $scope.flight = flight;                     // Response Handler #2
+                                return flight;
+                            });
+                },
+                loadForecast = function()
+                {
+                    return weatherService
+                            .getForecast( $scope.departure.date )           // Reqeust #3
+                            .then(function( weather )
+                            {
+                                $scope.weather = weather;                   // Response Handler #3
+                                return weather;
+                            });
+                };
 
 
-		// 3-easy steps to load all of our information...
-		// and includes logging of problems with ANY of the steps
+            // 3-easy steps to load all of our information...
 
-		loadFlight( user )
-			.then( loadPlaneStatus )
-			.then( loadWeatcherForecast );
+            loadDeparture( user )
+                .then( loadFlight )
+                .then( loadForecast );
 
-		$scope.flight     = null;
-		$scope.planStatus = null;
-		$scope.forecast   = null;
-	};
+
+            $scope.user       = user;
+            $scope.departure  = null;
+            $scope.flight     = null;
+            $scope.weather    = null;
+
+        };
 ```
 
-This is better; each segment of the *chain* is now a self-contained, named function. 
+Now we have three (3) intuitively-named functions: `loadDeparture()`, `loadFlight()`, and `loadForecast()`… all chained together in a flat chain; each segment of the *chain* is now a self-contained, named function. 
 
+```
+loadDeparture( user ).then( loadFlight ).then( loadForecast );
+```
+
+Each of these functions internally makes a service call, gets a promise, and attaches a success handler to the promise. And Each handler publishes something to the scope.
+
+But two other VERY important things are now happening:
+
+1) Returning Promises instead of data objects:
 >
-An anti-pattern issue still exists here. This solution has that one (1) funky **hack**:  Notice how the weather service had to use `$scope.flight.departure` within its `getForecast()` call. `loadWeatherForecast()` accepts a `plane` argument... but does not have direct access to the `flight` reference. 
+Notice that each of the segments (loadDeparture, loadFlight, loadWeather) returns a Promise. The important thing to realize here is the instead of returning a data object, we are returning another promise. Returning promises allows use to build chains where each segment is only resolved when the promise at the segment resolves... and that promise could itself represent a subchain.
+While a segment is waiting for its promise to resolve or reject... all the remaining segments in the chain are waiting... and in fact, those segments have not even been called yet.The async requests in subsequent segments are queued and have not even been called yet.
+This is promise chaining. This is very powerful.
+
+2) Success handlers return data values:
+>
+Notice that the internal Promise success handler of each segment returns a value... a value that may be passed as an argument value when invoking the next segment of the promise chain. See how the first segment `loadDeparture()` returns the `flightID`… which is passed as an argument when invoking the call to `loadFlight()`? And While `loadFlight()` returns the `flight` object, the next segment `loadWeather()` ignores that value.
+
+
+This flattened-promise chain is now really easy to understand and manage.
+
+An anti-pattern issue still exists here. This solution has that one (1) funky **hack**:  
+
+Notice how the weather service had to use `$scope.departure.date` within its `getForecast()` call. `loadWeatherForecast()` can only directly receive a `flight` argument... and it does not have direct access to the `flight` reference. 
 
 
 ---
 
 ### Finally 
 
-Finally, we should consider the dependencies of each segment of the *chain*. Notice that not all of our requests have to be sequential [and thus wait for all previous segments to finish first]. In our scenario, the Plane and Weather service calls could be requested in parallel [independent of each other]. 
+Finally, we should consider the dependencies of each segment of the *chain*. Notice that not all of our requests have to be sequential [and thus wait for all previous segments to finish first]. In our scenario, the Flight and Weather service calls could be requested in parallel [independent of each other]. 
+
+
+![parallel chaining](https://f.cloud.github.com/assets/210413/1777751/2c3e687e-682a-11e3-83a9-f04f488a028c.jpg)
 
 We will use the `$q.all()` and the `$q.spread()` methods to condense our code and centralize all `$scope` changes. 
 
-```javascript
-var FlightDashboard = function( $scope, user, flightService, weatherService, $log, $q )
-	{
-		var loadFlight = function( user )
-			{
-				return flightService.getUpcomingFlight( user );					// Request #1
-			},
-			/**
-			 * Parallel processing for request #2 & #3
-			 * Also only updates scope when ALL is ready...
-			 */
-			loadStatusAndWeather = function ( flight )
-			{
-				// Execute #2 & #3 in parallel...
-
-				return $q.all([
-							getPlaneDetails( flight.id ),						// Request #2
-							weatherService.getForecast( flight.departure )		// Reqeust #3
-						])
-						.then( $q.spread( function( status, forecast )
-						{
-								$scope.flight      = flight;					// Response Handler #1
-								$scope.planeStatus = planeStatus;				// Response Handler #2
-								$scope.forecast    = forecast;					// Response Handler #3
-						}));
-			}
-			/**
-			 * Cool logging feature for rejections or exceptions
-			 */
-			reportProblems = function( fault )
-			{
-				$log.error( String(fault) );
-			};
-
-
-		// 3-easy steps to load all of our information...
-		// and now we can include logging for of problems within ANY of the steps
-
-		loadFlight( user )
-			.then( loadStatusAndWeather )
-			.catch( reportProblems );
-
-	};
 ```
+var FlightDashboard = function( $scope, user, travelService, weatherService, $q, $log )
+    {
+        var loadFlight = function( user )
+            {
+                return travelService.getDeparture( user.email );               // Request #1
+            },
+            parallelLoad = function ( departure )
+            {
+                // Execute #2 & #3 in parallel...
+
+                return $q.all([
+                        travelService.getFlight( departure.flightID ),         // Request #2
+                        weatherService.getForecast( departure.date  )          // Reqeust #3
+                    ])
+                    .then( $q.spread( function( flight, weather )
+                    {
+                        $scope.departure   = departure;                        // Response Handler #1
+                        $scope.flight      = flight;                           // Response Handler #2
+                        $scope.weather     = weather;                          // Response Handler #3
+
+						 // Let's force an error to demonstrate the reportProblem() works!
+						 
+                        throw( new Error("Just to prove catch() works! ") );
+                    }));
+            },
+            reportProblems = function( fault )
+            {
+                $log.error( String(fault) );
+            };
+
+
+        // 3-easy steps to load all of our information...
+        // and now we can include logging for of problems within ANY of the steps
+
+        loadFlight( user )
+            .then( parallelLoad )
+            .catch( reportProblems );
+
+    };
+
+```
+
 
 The last version is very clean and terse. I simplified even further AND I also added a **exception handler**!
 
@@ -289,7 +316,7 @@ Open Chrome Developer tools and you can breakpoint/step thru the logic and code 
 
 ### Summary
 
-Hopefully I have shown you some elegant and sophisticated techinques for chaining promises. The above chain even become more complicated:
+Hopefully I have shown you some elegant and sophisticated techinques for chaining promises. The above chain can easily become even more complicated:
 
 ![TreeOfChains](https://f.cloud.github.com/assets/210413/1750919/afbfb5a4-65be-11e3-93d6-b5b61865bd0b.jpg)
 
