@@ -20,8 +20,7 @@ Let's explore the hidden power in chain promises.
 
 Consider the Travel Service shown which loads information about the user's upcoming travel departure. Below our *service* shows how a a remote web service by returns a JSON data file... Remember that data calls are asynchronous and our TravelService request generates **a promise to respond** when the information is loaded.
 
-```
-
+```javascript
 var TravelService = function( $http )
 	{
 		return {
@@ -39,7 +38,7 @@ var TravelService = function( $http )
 
 Now let's use this service from a `FlightDashboard` to load the user's scheduled flight:
 
-```
+```javascript
 var FlightDashboard = function( $scope, user, travelService )
 	{
 		travelService
@@ -68,7 +67,7 @@ The scenario here is a cascaded 3-call sequence:  `getDeparture()` -> `getFlight
 ![sequential chaining](https://f.cloud.github.com/assets/210413/1777753/2e351326-682a-11e3-844a-d3583486f558.jpg)
 
 
-```
+```javascript
 var FlightDashboard = function( $scope, user, travelService, weatherService )
     {
         // Level 1
@@ -122,7 +121,7 @@ I personally consider deep nesting to be an **anti-pattern**. Fortunately we can
 
 Since promise handlers can **return Promises**, let's use that technique to refactor a new implementation:
 
-```
+```javascript
 var FlightDashboard = function( $scope, user, flightService, weatherService )
     {
         travelService
@@ -167,7 +166,7 @@ This is also an anti-pattern example... for several reasons:
 
 What else can we do? What if we viewed each request-response as a self-contained process? Then we could chain processes...
 
-```
+```javascript
     var FlightDashboard = function( $scope, user, travelService, weatherService )
         {
             var loadDeparture = function( user )
@@ -220,7 +219,7 @@ What else can we do? What if we viewed each request-response as a self-contained
 
 Now we have three (3) intuitively-named functions: `loadDeparture()`, `loadFlight()`, and `loadForecast()`… all chained together in a flat chain; each segment of the *chain* is now a self-contained, named function. 
 
-```
+```javascript
 loadDeparture( user ).then( loadFlight ).then( loadForecast );
 ```
 
@@ -257,7 +256,7 @@ Finally, we should consider the dependencies of each segment of the *chain*. Not
 
 We will use the `$q.all()` and the `$q.spread()` methods to condense our code and centralize all `$scope` changes. 
 
-```
+```javascript
 var FlightDashboard = function( $scope, user, travelService, weatherService, $q, $log )
     {
         var loadFlight = function( user )
