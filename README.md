@@ -155,10 +155,10 @@ The important change here is to notice that the reponse handler **returns** a Pr
 >
 Remember that success handlers can either (a) return the response value, (b) throw an exception, or (c) return a **Promise**
 
-This is a good example of a flattened **promise chain** approach.
+This is a good example of a flattened **promise chain** approach. But I do not like this solution because I had to my **success** handlers are simply function wrappers that internally call another promise-returning API. It would be great if I could eliminate those *tedious* function wrappers!
 
 >
-This is also an anti-pattern example... for several reasons:
+This is also manifest at least two other anti-patterns:
 *  we modified a $scope variable at each level; instead of a single-pass modification of all three (3) $scope variables.
 *  `getForecast()` call references `$scope.departure.date` instead of an *argument-passed reference*.
 
