@@ -48,7 +48,7 @@ var FlightDashboard = function( $scope, user, travelService )
 			.then( function( departure )
 			{
 				// Publish the departure details to the view
-				$departure = departure;
+				$scope.departure = departure;
 			});
 
 		$scope.departure = null;
@@ -178,7 +178,6 @@ What else can we do? What if we viewed each request-response as a self-contained
                             .then( function( departure )
                             {
                                 $scope.departure = departure;               // Response Handler #1
-
                                 return departure.flightID;
                             });
                 },
