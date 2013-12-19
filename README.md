@@ -12,7 +12,7 @@ But even more important than the features above, Promises support easy **chainin
 >
 ...and we will also discuss the some of hidden anti-patterns
 
-Below I explore and discuss the hidden power in chain promises. Or your can simply watch the Egghead.io video tutorial:
+Below I explore and discuss the hidden power in chain promises. Or your can simply watch the [Egghead.io Video Tutorial](http://egghead.io/lessons/angularjs-chained-promises):
 
 ![chaining-promises video](https://f.cloud.github.com/assets/210413/1779100/787e1fb6-6840-11e3-8f87-2f8a3a1aaee0.jpg)
 
