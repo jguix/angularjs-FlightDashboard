@@ -9,10 +9,12 @@ Promises allow developers to easily attach *1x-only notifications of response* t
 
 But even more important than the features above, Promises support easy **chaining** of custom activity or computations. Managing sequences or chains of asynchronous activity can be a very difficult and complex effort. Promise chains are **amazing** and provide means to easily build sequences of asynchronous requests or asynchronous activity. 
 
-Let's explore the hidden power in chain promises. 
-
 >
 ...and we will also discuss the some of hidden anti-patterns
+
+Below I explore and discuss the hidden power in chain promises. Or your can simply watch the Egghead.io video tutorial:
+
+![chaining-promises video](https://f.cloud.github.com/assets/210413/1779100/787e1fb6-6840-11e3-8f87-2f8a3a1aaee0.jpg)
 
 ---
 
