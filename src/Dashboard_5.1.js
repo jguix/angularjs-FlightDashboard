@@ -1,7 +1,7 @@
 (function( ) {
     "use strict";
 
-    var FlightDashboard = function( $scope, user, flightService, weatherService, $log )
+    var FlightDashboard = function( $scope, user, travelService, weatherService, $log )
         {
             /**
              * Cool logging feature for rejections or exceptions
@@ -13,34 +13,34 @@
 
             // Level 1
 
-            flightService
-                .getFlightDetails( user.email )                     // Request #1
-                .then( function( details )                          // Response Handler #1
+            travelService
+                .getDeparture( user.email )                            // Request #1
+                .then( function( departure )                           // Response Handler #1
                 {
-                    $scope.flight = details.flight;
+                    $scope.departure = departure;
 
                     // Level 2
 
-                    return flightService
-                        .getPlaneDetails( details.flight.id )           // Request #2
-                        .then( function( plane  )                       // Response Handler #2
-                        {
-                            $scope.plane = plane ;
+                    return travelService
+                            .getFlight( departure.flightID )           // Request #2
+                            .then( function( flight  )                 // Response Handler #2
+                            {
+                                $scope.flight = flight;
 
-                            // Level 3
+                                // Level 3
 
-                            return weatherService
-                                .getForecast( details.flight.departure )    // Reqeust #3
-                                .then( function( info )                     // Response Handler #3
-                                {
-                                    $scope.forecast = info.forecast;
-                                });
-                        });
+                                return weatherService
+                                    .getForecast( departure.date )     // Reqeust #3
+                                    .then( function( weather )         // Response Handler #3
+                                    {
+                                        $scope.weather = weather;
+                                    });
+                            });
                 })
                 .catch( reportProblems );
         };
 
 
-    window.FlightDashboard = [ "$scope", "user", "flightService", "weatherService", "$log", FlightDashboard ];
+    window.FlightDashboard = [ "$scope", "user", "travelService", "weatherService", "$log", FlightDashboard ];
 
 }( ));

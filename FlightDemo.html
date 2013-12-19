@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>AngularJS Promise-Chaining Demo</title>
+
+        <link href="./css/demo.css" rel="stylesheet">
+        <script src="./lib/$QDecorator.js"  ></script>
+        <script src="./lib/angular.js"      ></script>
+        <script src="src/FlightServices.js"></script>
+        <script src="src/Dashboard_4.js"></script>
+        <script>
+
+            // Start the AngularJS engine for MyFlightApp
+
+            angular.module(
+                        "FlightDemo",
+                        [ "FlightServices" ]
+                    )
+                    .controller(
+                        "flightDashboard",
+                        FlightDashboard
+                    );
+        </script>
+
+    </head>
+    <body ng-app="FlightDemo" ng-controller="flightDashboard" >
+
+        <h1>Hello  <span class="user">{{ user.email }}</span></h1>
+
+
+        <div class="itinerary">
+            <p>Here is your itinerary:</p>
+
+            <span class="title"> Your Departure:   </span> {{ departure.date }}                               <br/>
+            <span class="title"> Your Flight:      </span> {{ flight.plane.make }} {{ flight.plane.model }} <br/>
+            <span class="title"> Weather Forecast: </span> {{ weather.forecast }}                             <br/>
+        </div>
+
+        <footer>
+            <a href="https://github.com/ThomasBurleson/angularjs-FlightDashboard">
+                GitHub Source
+            </a>
+        </footer>
+    </body>
+</html>

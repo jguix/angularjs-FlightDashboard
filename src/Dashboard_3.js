@@ -1,56 +1,57 @@
 (function() {
     "use strict";
 
-    var FlightDashboard = function( $scope, user, flightService, weatherService )
+    var FlightDashboard = function( $scope, user, travelService, weatherService )
         {
-            var loadFlight = function( user )
+            var loadDeparture = function( user )
                 {
-                    return flightService
-                            .getFlightDetails( user.email )                     // Request #1
-                            .then( function( details )
+                    return travelService
+                            .getDeparture( user.email )                     // Request #1
+                            .then( function( departure )
                             {
-                                $scope.flight = details.flight;                        // Response Handler #1
+                                $scope.departure = departure;               // Response Handler #1
 
-                                return details.flight;
+                                return departure.flightID;
                             });
                 },
-                loadPlaneStatus = function( flight )
+                loadFlight = function( flightID)
                 {
-                    return flightService
-                            .getPlaneDetails( flight.id )                       // Request #2
-                            .then( function( plane )
+                    return travelService
+                            .getFlight( flightID )                          // Request #2
+                            .then( function( flight )
                             {
-                                $scope.plane = plane;                           // Response Handler #2
-                                return plane;
+                                $scope.flight = flight;                     // Response Handler #2
+                                return flight;
                             });
                 },
-                loadWeatherForecast = function()
+                loadForecast = function()
                 {
                     return weatherService
-                            .getForecast( $scope.flight.departure )                   // Reqeust #3
-                            .then(function( info )
+                            .getForecast( $scope.departure.date )           // Reqeust #3
+                            .then(function( weather )
                             {
-                                $scope.forecast = info.forecast;                // Response Handler #3
-                                return info;
+                                $scope.weather = weather;                   // Response Handler #3
+                                return weather;
                             });
                 };
 
 
             // 3-easy steps to load all of our information...
-            // and includes logging of problems with ANY of the steps
 
-            loadFlight( user )
-                .then( loadPlaneStatus )
-                .then( loadWeatherForecast );
+            loadDeparture( user )
+                .then( loadFlight )
+                .then( loadForecast );
 
+
+            $scope.user       = user;
             $scope.flight     = null;
             $scope.plane      = null;
-            $scope.forecast   = null;
+            $scope.weather    = null;
 
         };
 
 
-    window.FlightDashboard = [ "$scope", "user", "flightService", "weatherService", FlightDashboard ];
+    window.FlightDashboard = [ "$scope", "user", "travelService", "weatherService", FlightDashboard ];
 
 }());
 
