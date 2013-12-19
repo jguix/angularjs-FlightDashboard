@@ -155,7 +155,7 @@ The important change here is to notice that the reponse handler **returns** a Pr
 >
 Remember that success handlers can either (a) return the response value, (b) throw an exception, or (c) return a **Promise**
 
-This is a good example of a flattened **promise chain** approach. But I do not like this solution because I had to my **success** handlers are simply function wrappers that internally call another promise-returning API. It would be great if I could eliminate those *tedious* function wrappers!
+This is a good example of a flattened **promise chain** approach. But I do not like this solution because I had to create my **success** handlers as function wrappers that essentially only call another promise-returning API. It would be great if I could eliminate those *tedious* function wrappers... which seems like an un-necessary layer!
 
 >
 This is also manifest at least two other anti-patterns:
