@@ -1,5 +1,3 @@
-(function( ) {
-    "use strict";
 
     // 3-call sequence:  getFlightDetails() -> (getPlaneDetails() + getForecast())
 
@@ -10,7 +8,7 @@
                 {
                     return travelService.getDeparture( user.email );               // Request #1
                 },
-                parallelLoad = function ( departure )
+                loadFlightWeather = function ( departure )
                 {
                     // Execute #2 & #3 in parallel...
 
@@ -24,7 +22,7 @@
 
                             $scope.departure   = departure;                        // Response Handler #1
                             $scope.flight      = flight;                           // Response Handler #2
-                            $scope.weather    = weather;                           // Response Handler #3
+                            $scope.weather     = weather;                          // Response Handler #3
 
                         }));
                 };
@@ -32,13 +30,8 @@
 
             // Wow! So much simpler...
 
-            loadFlight( user ).then( parallelLoad );
-
+            loadFlight( user ).then( loadFlightWeather );
 
         };
 
-
-    window.FlightDashboard = [ "$scope", "user", "travelService", "weatherService", "$q", FlightDashboard ];
-
-}( ));
 

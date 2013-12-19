@@ -1,5 +1,3 @@
-(function( ) {
-    "use strict";
 
     var FlightDashboard = function( $scope, user, travelService, weatherService, $q, $log )
         {
@@ -39,7 +37,4 @@
 
         };
 
-    window.FlightDashboard = [ "$scope", "user", "travelService", "weatherService", "$q", "$log", FlightDashboard ];
-
-}( ));
 

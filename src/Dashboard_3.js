@@ -1,5 +1,3 @@
-(function() {
-    "use strict";
 
     var FlightDashboard = function( $scope, user, travelService, weatherService )
         {
@@ -10,7 +8,6 @@
                             .then( function( departure )
                             {
                                 $scope.departure = departure;               // Response Handler #1
-
                                 return departure.flightID;
                             });
                 },
@@ -50,8 +47,4 @@
 
         };
 
-
-    window.FlightDashboard = [ "$scope", "user", "travelService", "weatherService", FlightDashboard ];
-
-}());
 

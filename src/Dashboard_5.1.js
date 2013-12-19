@@ -1,5 +1,3 @@
-(function( ) {
-    "use strict";
 
     var FlightDashboard = function( $scope, user, travelService, weatherService, $log )
         {
@@ -39,8 +37,3 @@
                 })
                 .catch( reportProblems );
         };
-
-
-    window.FlightDashboard = [ "$scope", "user", "travelService", "weatherService", "$log", FlightDashboard ];
-
-}( ));
