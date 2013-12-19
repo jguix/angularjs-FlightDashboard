@@ -155,10 +155,10 @@ The important change here is to notice that the reponse handler **returns** a Pr
 >
 Remember that success handlers can either (a) return the response value, (b) throw an exception, or (c) return a **Promise**
 
-This is a good example of a flattened **promise chain** approach.
+This is a good example of a flattened **promise chain** approach. But I do not like this solution because I had to create my **success** handlers as function wrappers that essentially only call another promise-returning API. It would be great if I could eliminate those *tedious* function wrappers... which seem like an unnecessary, extra layers!
 
 >
-This is also an anti-pattern example... for several reasons:
+This is also manifest at least two other anti-patterns:
 *  we modified a $scope variable at each level; instead of a single-pass modification of all three (3) $scope variables.
 *  `getForecast()` call references `$scope.departure.date` instead of an *argument-passed reference*.
 
@@ -230,7 +230,7 @@ But two other VERY important things are now happening:
 
 1) Returning Promises instead of data objects:
 >
-Notice that each of the segments (loadDeparture, loadFlight, loadWeather) returns a Promise. The important thing to realize here is the instead of returning a data object, we are returning another promise. Returning promises allows use to build chains where each segment is only resolved when the promise at the segment resolves... and that promise could itself represent a subchain.
+Notice that each of the chain segments (loadDeparture, loadFlight, loadWeather) returns a Promise. The important thing to realize here is the instead of returning a data object, we are returning another promise. Returning promises allows use to build chains where each segment is only resolved when the promise at the segment resolves... and that promise could itself represent a subchain.
 While a segment is waiting for its promise to resolve or reject... all the remaining segments in the chain are waiting... and in fact, those segments have not even been called yet.The async requests in subsequent segments are queued and have not even been called yet.
 This is promise chaining. This is very powerful.
 
