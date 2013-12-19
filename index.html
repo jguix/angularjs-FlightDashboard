@@ -7,20 +7,14 @@
         <link href="./css/demo.css" rel="stylesheet">
         <script src="./lib/$QDecorator.js"  ></script>
         <script src="./lib/angular.js"      ></script>
-
-        <!--
-            Custom application code
-        -->
-
         <script src="src/FlightServices.js"></script>
         <script src="src/Dashboard_4.js"></script>
-
         <script>
 
             // Start the AngularJS engine for MyFlightApp
 
             angular.module(
-                        "MyFlightApp",
+                        "FlightDemo",
                         [ "FlightServices" ]
                     )
                     .controller(
@@ -30,11 +24,23 @@
         </script>
 
     </head>
-    <body ng-app="MyFlightApp" ng-controller="flightDashboard" style="padding-left:20px; padding-top:30px;">
+    <body ng-app="FlightDemo" ng-controller="flightDashboard" >
 
-        Your Departure: <span class="departure">{{ flight.departure }}</span><br/>
-        Your Departure: <span class="departure">{{ forecast }}</span><br/>
-        Flight #: <span class="departure">{{ plane.make.model }}</span><br/>
+        <h1>Hello  <span class="user">{{ user.email }}</span></h1>
 
+
+        <div class="itinerary">
+            <p>Here is your itinerary:</p>
+
+            <span class="title"> Your Departure:   </span> {{ departure.date }}                               <br/>
+            <span class="title"> Your Flight:      </span> {{ flight.plane.make }} {{ flight.plane.model }} <br/>
+            <span class="title"> Weather Forecast: </span> {{ weather.forecast }}                             <br/>
+        </div>
+
+        <footer>
+            <a href="https://github.com/ThomasBurleson/angularjs-FlightDashboard">
+                GitHub Source
+            </a>
+        </footer>
     </body>
 </html>

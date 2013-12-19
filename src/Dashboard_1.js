@@ -1,20 +1,22 @@
 (function() {
     "use strict";
 
-   // 1-call sequence:  getFlightDetails()
-
-   var  FlightDashboard = function( $scope, user, flightService )
+   var  FlightDashboard = function( $scope, user, travelService, weatherService )
         {
-            flightService
-                .getFlightDetails( user.email )         // Request #1
-                .then( function( response )
+            $scope.user = user;
+
+            // Level 1
+            travelService
+                .getDeparture( user.email )                 // Request #1
+                .then( function( departure )                // Response Handler #1
                 {
-                  $scope.flight = response.flight;       // Response #1
+                    $scope.departure = departure;
 
                 });
+
         };
 
-    window.FlightDashboard = [ "$scope", "user", "flightService", FlightDashboard ];
+    window.FlightDashboard = [ "$scope", "user", "travelService", "weatherService", FlightDashboard ];
 
 }());
 
