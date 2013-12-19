@@ -41,8 +41,8 @@
 
 
             $scope.user       = user;
+            $scope.departure  = null;
             $scope.flight     = null;
-            $scope.plane      = null;
             $scope.weather    = null;
 
         };
