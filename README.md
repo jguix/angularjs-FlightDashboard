@@ -103,10 +103,10 @@ var FlightDashboard = function( $scope, user, travelService, weatherService )
 Notice how the success handler for getFlight() is passed the flight object. And the success handler for getForecast() is passed the weather object... both of which are published to the scope.
 
 
-The above implementation uses deep-nesting to create a sequential, cascading chain of three (3) asynchronous requests; requests to load the user's depature, flight information, and weather forecast. 
+The above implementation uses deep-nesting to create a sequential, cascading chain of three (3) asynchronous requests; requests to load the user's departure, flight information, and weather forecast. 
 
 >
-Note that the code shown above does NOT handle errors. And any nested rejections will not be propogated properly.
+Note that the code shown above does NOT handle errors. And any nested rejections will not be propagated properly.
 
 ---
 
@@ -118,8 +118,8 @@ I personally consider deep nesting to be an **anti-pattern**. Fortunately we can
 
 *  A value - that will be delivered to subsequent resolve handlers
 *  A **promise** - that will create a branch queue of async activity
-*  A exception - to reject sebsequent promise activity
-*  A rejected promise - to propogate rejections to subsequent handlers
+*  A exception - to reject subsequent promise activity
+*  A rejected promise - to propagate rejections to subsequent handlers
 
 Since promise handlers can **return Promises**, let's use that technique to refactor a new implementation:
 
@@ -137,7 +137,7 @@ var FlightDashboard = function( $scope, user, flightService, weatherService )
             .then( function( flight )
             {
                 $scope.flight = flight;                                     // Response Handler #2
-                return weatherService.getForecast( $scope.departure.date ); // Reqeust #3
+                return weatherService.getForecast( $scope.departure.date ); // Request #3
             })
             .then( function( weather )
             {
@@ -150,7 +150,7 @@ var FlightDashboard = function( $scope, user, flightService, weatherService )
     };
 ```
 
-The important change here is to notice that the reponse handler **returns** a Promise. See how the handler for `getDeparture()` returns a promise for `getFlight()`? And the success handler for `getFlight()` which returns a promise for `getForecast()`. 
+The important change here is to notice that the response handler **returns** a Promise. See how the handler for `getDeparture()` returns a promise for `getFlight()`? And the success handler for `getFlight()` which returns a promise for `getForecast()`. 
 
 >
 Remember that success handlers can either (a) return the response value, (b) throw an exception, or (c) return a **Promise**
@@ -194,7 +194,7 @@ What else can we do? What if we viewed each request-response as a self-contained
                 loadForecast = function()
                 {
                     return weatherService
-                            .getForecast( $scope.departure.date )           // Reqeust #3
+                            .getForecast( $scope.departure.date )           // Request #3
                             .then(function( weather )
                             {
                                 $scope.weather = weather;                   // Response Handler #3
@@ -270,7 +270,7 @@ var FlightDashboard = function( $scope, user, travelService, weatherService, $q,
 
                 return $q.all([
                         travelService.getFlight( departure.flightID ),         // Request #2
-                        weatherService.getForecast( departure.date  )          // Reqeust #3
+                        weatherService.getForecast( departure.date  )          // Request #3
                     ])
                     .then( $q.spread( function( flight, weather )
                     {
@@ -316,13 +316,13 @@ Open Chrome Developer tools and you can breakpoint/step thru the logic and code 
 
 ### Summary
 
-Hopefully I have shown you some elegant and sophisticated techinques for chaining promises. The above chain can easily become even more complicated:
+Hopefully I have shown you some elegant and sophisticated techniques for chaining promises. The above chain can easily become even more complicated:
 
 ![TreeOfChains](https://f.cloud.github.com/assets/210413/1750919/afbfb5a4-65be-11e3-93d6-b5b61865bd0b.jpg)
 
 But even these complicated chains are easy to manage with the techniques that I have demonstrated.
 
-And if this somewhat trivial example does  not convince you... check out a real-world refactor of the Dash.js class [DownloadRules Gist](https://gist.github.com/ThomasBurleson/7576083). The refactor is a Gist source with a conversation thread dicussing the tradeoffs and considerations. 
+And if this somewhat trivial example does  not convince you... check out a real-world refactor of the Dash.js class [DownloadRules Gist](https://gist.github.com/ThomasBurleson/7576083). The refactor is a Gist source with a conversation thread discussing the tradeoffs and considerations. 
 
 >
 Readers can see how [in the [DownloadRules Gist](https://gist.github.com/ThomasBurleson/7576083)] how complex code and logic can be reduced and flattened into something very manageable and conceptually understandable.
