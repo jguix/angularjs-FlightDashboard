@@ -6,7 +6,7 @@
 
             var loadFlight = function( user )
                 {
-                    return travelService.getDeparture( user.email );               // Request #1
+                    return travelService.getDeparture( user );               // Request #1
                 },
                 loadFlightWeather = function ( departure )
                 {
